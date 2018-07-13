@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ascii draw</title>
+
+<style type="text/css">
+	#scribble {
+		background-color: #eee;
+		display: block;
+		font-family: monospace;
+		margin-top: 1em;
+		overflow: hidden;
+		padding:0em;
+		width: 200px;
+		height: 200px;
+	}
+	#container {
+		font-family: monospace;
+		width: 200px;
+		height: 200px;
+	}
+	.char {
+		float: left;
+		border:1px solid #ccc;
+		text-align: center;
+		width:8px;
+		height:16px;
+	}
+	.not-selectable {
+	  -webkit-touch-callout: none;
+	  -webkit-user-select: none;
+	  -khtml-user-select: none;
+	  -moz-user-select: none;
+	  -ms-user-select: none;
+	  user-select: none;
+	}
+	.palette a {
+		background-color: #eee;
+		border:1px solid gray;
+		padding: .25em;
+	}
+</style>
+</head>
+<body>
+
+<h1>ASCII Drawing Board</h1>
+<p>Draw on the grid below. View and copy-and-paste your results below the grid.</p>
+
+<!--<div id="board" style="width:200px; height:200px; border:1px solid black; font-family: monospace;"></div> -->
+
+<div id="container" class="not-selectable">
+<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
+<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
+<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
+<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
+<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
+<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
+<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
+<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
+<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
+<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
+</div>
+
+<div class="palette">
+	hash: <a href="#" id="hash">#</a>
+	at-sign: <a href="#" id="at">@</a>
+	dot: <a href="#" id="dot">.</a>
+	eraser: <a href="#" id="eraser">&nbsp;</a>
+	custom: <a href="#" onclick="changeTargetChar(window.prompt('What character?')); return false;">click</a>
+</div>
+
+<div id="scribble"></div>
+
+<script>
+	var isActive = false;
+
+	var ignore = function () {
+		return false;
+	}
+	var targetChar = "#";
+	var changeTargetChar = function (ch) {
+		targetChar = ch;
+	}
+	var targetCharClick = function (e) {
+		changeTargetChar(e.target.innerHTML);
+		e.preventDefault();
+		e.stopPropagation();
+		return false;
+	}
+	var activeOff = function (e) {
+		isActive = false;
+	}
+	var toggleActive = function (e) {
+		isActive = ! isActive;
+	}
+    var drawascii = function (e) {
+    	if (isActive) {
+    		document.getElementById('scribble').value += '#' + e.clientX + ',' + e.clientY;
+    		document.getElementById('board').innerHTML += '#' + e.clientX + ',' + e.clientY;
+    	}
+    }
+
+    var dumpText = function() {
+		document.getElementById('scribble').innerHTML = document.getElementById("container").textContent;
+    }
+
+    var addChar = function (e) {
+    	if (isActive) {
+    		e.target.innerHTML = targetChar;
+    		dumpText();
+    	}
+    }
+
+    var addCharDammit = function (e) {
+		e.target.innerHTML = targetChar;
+		dumpText();
+    }
+
+//    document.getElementById("palette").addEventListener("submit", ignore);
+    document.getElementById("hash").addEventListener("click", targetCharClick);
+    document.getElementById("at").addEventListener("click", targetCharClick);
+    document.getElementById("dot").addEventListener("click", targetCharClick);
+	document.getElementById("eraser").addEventListener("click", targetCharClick);
+
+//    document.getElementById("board").addEventListener("mouseout", activeOff);
+//    document.getElementById("board").addEventListener("mouseup", activeOff);
+//    document.getElementById('board').addEventListener("mousedown", toggleActive);
+//    document.getElementById("board").addEventListener("mousemove", drawascii);
+
+    document.getElementById('container').addEventListener("mousedown", toggleActive);
+    document.getElementById("container").addEventListener("mouseup", activeOff);
+    var charSpaces = document.getElementsByClassName("char");
+    for (i = 0; i < charSpaces.length; i = i + 1) {
+    	charSpaces[i].innerHTML = "&nbsp;";
+    	charSpaces[i].addEventListener("mouseenter", addChar);
+    	charSpaces[i].addEventListener("mousedown", addCharDammit);
+    }
+
+</script>
+
+</body>
+</html>
