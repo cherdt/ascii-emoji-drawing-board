@@ -5,59 +5,66 @@
 <title>ASCII (and emoji) drawing board</title>
 
 <style type="text/css">
-	#scribble {
-		background-color: #eee;
-		display: block;
-		font-family: monospace;
-		margin-top: 1em;
-		overflow: hidden;
-		padding:0em;
-		/* white-space: pre; */
-		width: 20em;
-		height: 260px;
-	}
-	#container {
-		float:left;
-		font-family: monospace;
-		margin-top:1em;
-		width: 24em;
-		height: 200px;
-	}
-	.char {
-		float: left;
-		border:1px solid #ccc;
-		text-align: center;
-		width:1em;
-		height:16px;
-	}
-	div.clear {
-		clear: both;
-	}
-	.not-selectable {
-	  -webkit-touch-callout: none;
-	  -webkit-user-select: none;
-	  -khtml-user-select: none;
-	  -moz-user-select: none;
-	  -ms-user-select: none;
-	  user-select: none;
-	}
-	.palette {
-		float:left;
-		margin:1em;
-		width:6.25em;
-	}
-	.palette a {
-		background-color: #eee;
-		border:1px solid gray;
-		display: block;
-		float:left;
-		font-size: large;
-		height:1.5em;
-		padding: .25em;
-		text-align: center;
-		text-decoration: none;
-		width:1.5em;
-	}
+    #container {
+        float:left;
+        font-family: monospace;
+        margin-top:1em;
+        width: 24em;
+        height: 200px;
+    }
+
+    .char {
+        float: left;
+        border:1px solid #ccc;
+        text-align: center;
+        width:1em;
+        height:16px;
+    }
+
+    div.clear {
+        clear: both;
+    }
+
+    /* I found the following somewhere, Stackoverflow maybe? */
+    .not-selectable {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .palette {
+        float:left;
+        margin:1em;
+        width:6.25em;
+    }
+
+    .palette a {
+        background-color: #eee;
+        border:1px solid gray;
+        display: block;
+        float:left;
+        font-size: large;
+        height:1.5em;
+        padding: .25em;
+        text-align: center;
+        text-decoration: none;
+        width:1.5em;
+    }
+
+    #scribble {
+        background-color: #eee;
+        display: block;
+        font-family: monospace;
+        margin-top: 1em;
+        overflow: hidden;
+        padding:0em;
+        /* white-space: pre; */
+        width: 20em;
+        height: 260px;
+    }
 </style>
 </head>
 <body>
@@ -68,158 +75,147 @@
 <p>Note that regular characters and emoji are different widths. Mixing and matching will result is loss of alignment. Some emoji are different widths than other emoji. It's...complicated.</p>
 
 <form method="POST" action="#" onsubmit="redrawBoard(); return false;">
-	<label>Width: <input type="text" name="width" id="width" size="2" maxlength="2" value="14"></label>
-	<label>Height: <input type="text" name="height" id="height" size="2" maxlength="2" value="8"></label>
-	<label>Emoji Mode: <input type="checkbox" name="emojiMode" id="emojiMode" value="1"></label>
-	<input type="submit" value="Update Board"> (clears current board)
+    <label>Width: <input type="text" name="width" id="width" size="2" maxlength="2" value="14"></label>
+    <label>Height: <input type="text" name="height" id="height" size="2" maxlength="2" value="8"></label>
+    <label>Emoji Mode: <input type="checkbox" name="emojiMode" id="emojiMode" value="1"></label>
+    <input type="submit" value="Update Board"> (clears current board)
 </form>
 
-<!--<div id="board" style="width:200px; height:200px; border:1px solid black; font-family: monospace;"></div> -->
-
 <div class="palette">
-	<a href="#" id="hash" title="#">#</a>
-	<a href="#" id="at" title="@">@</a>
-	<a href="#" id="dot" title=".">.</a>
-	<a href="#" id="dollar" title="dollar">$</a>
-	<a href="#" id="dash" title="dash">-</a>
-	<a href="#" id="equals" title="equals">=</a>
-	<a href="#" id="asterisk" title="asterisk">*</a>
-	<a href="#" id="eraser" title="eraser">&nbsp;</a>
-	<a href="#" id="robot" title="robot">&#129302;</a>
-	<a href="#" id="poop" title="poop">&#128169;</a>
-	<a href="#" id="eye" title="eye">&#128065;</a>
-	<a href="#" id="skull" title="eraser">&#128128;</a>
-	<div>custom: <input type="text" id="custom" size="1" maxlength="2"></div>
+    <a href="#" id="hash" title="#">#</a>
+    <a href="#" id="at" title="@">@</a>
+    <a href="#" id="dot" title=".">.</a>
+    <a href="#" id="dollar" title="dollar">$</a>
+    <a href="#" id="dash" title="dash">-</a>
+    <a href="#" id="equals" title="equals">=</a>
+    <a href="#" id="asterisk" title="asterisk">*</a>
+    <a href="#" id="eraser" title="eraser">&nbsp;</a>
+    <a href="#" id="robot" title="robot">&#129302;</a>
+    <a href="#" id="poop" title="poop">&#128169;</a>
+    <a href="#" id="eye" title="eye">&#128065;</a>
+    <a href="#" id="skull" title="eraser">&#128128;</a>
+    <div>custom: <input type="text" id="custom" size="1" maxlength="2"></div>
 </div>
 
+<!-- This is where the drawing takes place, contents populated by Javascript -->
 <div id="container" class="not-selectable"></div>
 
+<!-- This holds the text/emoji that is copy-paste friendly -->
 <div id="scribble"></div>
 
 <script>
-	var emojiMode = 0;
-	var toggleEmojiMode = function () {
-		if (document.getElementById("emojiMode").checked) {
-			emojiMode = 1;
-		} else {
-			emojiMode = 0;
-		}
-	}
-	document.getElementById("emojiMode").addEventListener("change", toggleEmojiMode);
+    // A few global variables
+    var emojiMode = 0; // default to ASCII text
+    var isActive = false; // default to pen-up
+    var targetChar = "#"; // the default character is an octothorpe
 
-	var redrawBoard = function () {
-		"use strict";
-		var w, h, i, j, clearNodeTemplate, clearNode, charNodeTemplate, charNode;
-		w = document.getElementById("width").value;
-		h = document.getElementById("height").value;
-		document.getElementById("container").innerHTML = "";
-		charNode = '<div class="char"></div>';
-		clearNodeTemplate = document.createElement("div");
-		clearNodeTemplate.className = "clear";
-		charNodeTemplate = document.createElement("div");
-		charNodeTemplate.className = "char";
-		for (i = 0; i < h; i++) {
-			for (j = 0; j < w; j++) {
-				charNode = charNodeTemplate.cloneNode();
-				if (j === 0) {
-					charNode.className = "char clear";
-				}
-				charNode.innerHTML = "&nbsp;";
-		    	charNode.addEventListener("mouseenter", addChar);
-		    	charNode.addEventListener("mousedown", addCharDammit);
-		    	charNode.addEventListener("touchstart", addCharDammit);
-		    	charNode.addEventListener("touchmove", addCharDammit);
-				document.getElementById("container").append(charNode);
-			}
-			//clearNode = clearNodeTemplate.cloneNode();
-			//clearNode.textContent = "\n";
-			//document.getElementById("container").append(clearNode);
-		}
-	}
+    // Turn emoji-mode on and off
+    var toggleEmojiMode = function () {
+        "use strict";
+        if (document.getElementById("emojiMode").checked) {
+            emojiMode = 1;
+        } else {
+            emojiMode = 0;
+        }
+    }
 
-	var isActive = false;
+    // Change emoji-mode when the emoji-mode checkbox is changed
+    document.getElementById("emojiMode").addEventListener("change", toggleEmojiMode);
 
-	var ignore = function () {
-		return false;
-	}
-	var targetChar = "#";
-	var changeTargetChar = function (ch) {
-		targetChar = ch;
-	}
-	var targetCharClick = function (e) {
-		var targetChar = "#";
-		if (e.target.innerHTML) {
-			targetChar = e.target.innerHTML;
-		} else {
-			targetChar = e.target.value;
-		}
-		changeTargetChar(targetChar);
-		e.preventDefault();
-		e.stopPropagation();
-		return false;
-	}
-	var activeOff = function (e) {
-		isActive = false;
-	}
-	var toggleActive = function (e) {
-		isActive = ! isActive;
-	}
-    var drawascii = function (e) {
-    	if (isActive) {
-    		document.getElementById('scribble').value += '#' + e.clientX + ',' + e.clientY;
-    		document.getElementById('board').innerHTML += '#' + e.clientX + ',' + e.clientY;
-    	}
+    // Re-create the drawing board, triggered on page load and optionally by the user
+    var redrawBoard = function () {
+        "use strict";
+        var w, h, i, j, charNodeTemplate, charNode;
+        w = document.getElementById("width").value;
+        h = document.getElementById("height").value;
+
+        // empty the current drawing board
+        document.getElementById("container").innerHTML = "";
+
+        charNode = '<div class="char"></div>';
+        charNodeTemplate = document.createElement("div");
+        charNodeTemplate.className = "char";
+        for (i = 0; i < h; i++) {
+            for (j = 0; j < w; j++) {
+                charNode = charNodeTemplate.cloneNode();
+                if (j === 0) {
+                    charNode.className = "char clear";
+                }
+                charNode.innerHTML = "&nbsp;";
+                charNode.addEventListener("mouseenter", addChar);
+                charNode.addEventListener("mousedown", addCharDammit);
+                charNode.addEventListener("touchstart", addCharDammit);
+                charNode.addEventListener("touchmove", addCharDammit);
+                document.getElementById("container").append(charNode);
+            }
+        }
+    }
+
+    var changeTargetChar = function (ch) {
+        "use strict";
+        targetChar = ch;
+    }
+
+    var targetCharClick = function (e) {
+        "use strict";
+        var targetChar = "#";
+        if (e.target.innerHTML) {
+            targetChar = e.target.innerHTML;
+        } else {
+            targetChar = e.target.value;
+        }
+        changeTargetChar(targetChar);
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+
+    var activeOff = function (e) {
+        "use strict";
+        isActive = false;
+    }
+
+    var toggleActive = function (e) {
+        "use strict";
+        isActive = ! isActive;
     }
 
     var dumpText = function() {
-    	var replace = "(.{" + (parseInt(document.getElementById("width").value,10) * (1+emojiMode)) + "})";
-		var re = new RegExp(replace,"g");
-		document.getElementById('scribble').innerHTML = document.getElementById("container").textContent.replace(re, "$1<br>");
-		//document.getElementById('scribble').innerHTML = document.getElementById('scribble').innerHTML.replace(re, "$1<br>");
-		//document.getElementById('scribble').innerHTML = document.getElementById('scribble').innerHTML.replace('\n', '');
-		//document.getElementById('scribble').innerHTML = document.getElementById("container").textContent;
+        "use strict";
+        var replace = "(.{" + (parseInt(document.getElementById("width").value,10) * (1+emojiMode)) + "})";
+        var re = new RegExp(replace,"g");
+        document.getElementById('scribble').innerHTML = document.getElementById("container").textContent.replace(re, "$1<br>");
     }
 
     var addChar = function (e) {
-    	if (isActive) {
-    		e.target.innerHTML = targetChar;
-    		dumpText();
-    	}
+        "use strict";
+        if (isActive) {
+            e.target.innerHTML = targetChar;
+            dumpText();
+        }
     }
 
     var addCharDammit = function (e) {
-		e.target.innerHTML = targetChar;
-		dumpText();
+        "use strict";
+        e.target.innerHTML = targetChar;
+        dumpText();
     }
 
-//    document.getElementById("palette").addEventListener("submit", ignore);
-	for (var item of ["hash","at","dot","dollar","dash","equals","eraser","asterisk","robot","poop","eye","skull"]) {
-		document.getElementById(item).addEventListener("click", targetCharClick);
-	}
-//	document.getElementById("custom").addEventListener("click", targetCharClick);
+    // Attach event handlers for palette selections
+    for (var item of ["hash","at","dot","dollar","dash","equals","eraser","asterisk","robot","poop","eye","skull"]) {
+        document.getElementById(item).addEventListener("click", targetCharClick);
+    }
 
-	// clear current custom value
-	document.getElementById("custom").addEventListener("focus", function (e) { e.target.value = ""; });
-	// Update target char whenever there is a change to custom
-	document.getElementById("custom").addEventListener("input", targetCharClick);
+    // clear current custom value
+    document.getElementById("custom").addEventListener("focus", function (e) { e.target.value = ""; });
+    // Update target char whenever there is a change to custom
+    document.getElementById("custom").addEventListener("input", targetCharClick);
 
 
-//    document.getElementById("board").addEventListener("mouseout", activeOff);
-//    document.getElementById("board").addEventListener("mouseup", activeOff);
-//    document.getElementById('board').addEventListener("mousedown", toggleActive);
-//    document.getElementById("board").addEventListener("mousemove", drawascii);
-
-    document.getElementById('container').addEventListener("mousedown", toggleActive);
+    document.getElementById("container").addEventListener("mousedown", toggleActive);
     document.getElementById("container").addEventListener("mouseup", activeOff);
-    var charSpaces = document.getElementsByClassName("char");
-    for (i = 0; i < charSpaces.length; i = i + 1) {
-    	charSpaces[i].innerHTML = "&nbsp;";
-    	charSpaces[i].addEventListener("mouseenter", addChar);
-    	charSpaces[i].addEventListener("mousedown", addCharDammit);
-    	charSpaces[i].addEventListener("touchstart", addCharDammit);
-    	charSpaces[i].addEventListener("touchmove", addCharDammit);
-    }
 
+    // This draws the initial board using the default width and height
     redrawBoard();
 
 </script>
