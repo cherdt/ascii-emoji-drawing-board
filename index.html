@@ -35,13 +35,13 @@
       user-select: none;
     }
 
-    .palette {
+    #palette {
         float:left;
         margin:1em;
         width:6.25em;
     }
 
-    .palette a {
+    #palette a {
         background-color: #eee;
         border:1px solid gray;
         display: block;
@@ -81,7 +81,7 @@
     <input type="submit" value="Update Board"> (clears current board)
 </form>
 
-<div class="palette">
+<div id="palette">
     <a href="#" id="hash" title="#">#</a>
     <a href="#" id="at" title="@">@</a>
     <a href="#" id="dot" title=".">.</a>
@@ -93,7 +93,7 @@
     <a href="#" id="robot" title="robot">&#129302;</a>
     <a href="#" id="poop" title="poop">&#128169;</a>
     <a href="#" id="eye" title="eye">&#128065;</a>
-    <a href="#" id="skull" title="eraser">&#128128;</a>
+    <a href="#" id="skull" title="skull">&#128128;</a>
     <div>custom: <input type="text" id="custom" size="1" maxlength="2"></div>
 </div>
 
@@ -210,6 +210,15 @@
     document.getElementById("custom").addEventListener("focus", function (e) { e.target.value = ""; });
     // Update target char whenever there is a change to custom
     document.getElementById("custom").addEventListener("input", targetCharClick);
+
+    // this would add additional items to the palette but can also cause problems
+    var addToPalette = function(e) {
+    	var newTool = document.createElement("a");
+    	newTool.textContent = e.target.value;
+    	document.getElementById("palette").insertBefore(newTool,document.getElementById("palette").getElementsByTagName("div")[0]);
+    	newTool.addEventListener("click", targetCharClick);
+    }
+    document.getElementById("custom").addEventListener("input", addToPalette);
 
 
     document.getElementById("container").addEventListener("mousedown", toggleActive);
