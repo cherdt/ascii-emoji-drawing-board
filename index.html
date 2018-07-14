@@ -5,6 +5,9 @@
 <title>ASCII (and emoji) drawing board</title>
 
 <style type="text/css">
+	hr {
+		clear: both;
+	}
     #container {
         float:left;
         font-family: monospace;
@@ -102,6 +105,11 @@
 
 <!-- This holds the text/emoji that is copy-paste friendly -->
 <div id="scribble"></div>
+
+<hr>
+<p><a href="#" onclick="resetPalette(); return false;">Reset Palette</a></p>
+<p>Questions? Comments? Contact chris @ osric . com.</p>
+
 
 <script>
     // A few global variables
@@ -211,12 +219,19 @@
     // Update target char whenever there is a change to custom
     document.getElementById("custom").addEventListener("input", targetCharClick);
 
-    // this would add additional items to the palette but can also cause problems
+    // this adds custom items to the palette but can also cause problems
     var addToPalette = function(e) {
     	var newTool = document.createElement("a");
+    	var paletteItems = [];
     	newTool.textContent = e.target.value;
+    	newTool.className = "local";
     	document.getElementById("palette").insertBefore(newTool,document.getElementById("palette").getElementsByTagName("div")[0]);
     	newTool.addEventListener("click", targetCharClick);
+    	if (window.localStorage.getItem("palette")) {
+    		paletteItems = JSON.parse(window.localStorage.getItem("palette"));
+    	}
+    	paletteItems.push(e.target.value);
+    	window.localStorage.setItem("palette", JSON.stringify(paletteItems));
     }
     document.getElementById("custom").addEventListener("input", addToPalette);
 
@@ -226,6 +241,26 @@
 
     // This draws the initial board using the default width and height
     redrawBoard();
+
+    var resetPalette = function () {
+    	var i, nodes;
+    	window.localStorage.removeItem("palette");
+    	nodes = document.getElementById("palette").getElementsByClassName("local");
+    	for (i = nodes.length - 1; i >= 0; i--) {
+    		nodes.item(i).remove();
+    	}
+    }
+
+    // Add custom palette items from local storage
+    if (window.localStorage.getItem("palette")) {
+	    for (item of JSON.parse(window.localStorage.getItem("palette"))) {
+	    	console.log(item);
+	    	var newTool = document.createElement("a");
+	    	newTool.className = "local";
+	    	newTool.textContent = item;
+	    	document.getElementById("palette").insertBefore(newTool,document.getElementById("palette").getElementsByTagName("div")[0]);
+	    }    	
+    }
 
 </script>
 
