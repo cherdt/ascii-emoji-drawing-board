@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>ascii (and emoji) drawing board</title>
+<title>ASCII (and emoji) drawing board</title>
 
 <style type="text/css">
 	#scribble {
@@ -65,7 +65,7 @@
 <h1>ASCII* Drawing Board</h1>
 <p><em>* and <a href="https://getemoji.com/">emoji</a>!</em></p>
 <p>Draw on the grid below. View and copy-and-paste your results in the adjacent box.</p>
-<p>Note that regular characters and emoji are different widths. Mixing and matching will result is loss of alignment.</p>
+<p>Note that regular characters and emoji are different widths. Mixing and matching will result is loss of alignment. Some emoji are different widths than other emoji. It's...complicated.</p>
 
 <form method="POST" action="#" onsubmit="redrawBoard(); return false;">
 	<label>Width: <input type="text" name="width" id="width" size="2" maxlength="2" value="14"></label>
@@ -85,6 +85,10 @@
 	<a href="#" id="equals" title="equals">=</a>
 	<a href="#" id="asterisk" title="asterisk">*</a>
 	<a href="#" id="eraser" title="eraser">&nbsp;</a>
+	<a href="#" id="robot" title="robot">&#129302;</a>
+	<a href="#" id="poop" title="poop">&#128169;</a>
+	<a href="#" id="eye" title="eye">&#128065;</a>
+	<a href="#" id="skull" title="eraser">&#128128;</a>
 	<div>custom: <input type="text" id="custom" size="1" maxlength="2"></div>
 </div>
 
@@ -117,6 +121,9 @@
 		for (i = 0; i < h; i++) {
 			for (j = 0; j < w; j++) {
 				charNode = charNodeTemplate.cloneNode();
+				if (j === 0) {
+					charNode.className = "char clear";
+				}
 				charNode.innerHTML = "&nbsp;";
 		    	charNode.addEventListener("mouseenter", addChar);
 		    	charNode.addEventListener("mousedown", addCharDammit);
@@ -124,9 +131,9 @@
 		    	charNode.addEventListener("touchmove", addCharDammit);
 				document.getElementById("container").append(charNode);
 			}
-			clearNode = clearNodeTemplate.cloneNode();
-			clearNode.textContent = "\n";
-			document.getElementById("container").append(clearNode);
+			//clearNode = clearNodeTemplate.cloneNode();
+			//clearNode.textContent = "\n";
+			//document.getElementById("container").append(clearNode);
 		}
 	}
 
@@ -167,7 +174,9 @@
     var dumpText = function() {
     	var replace = "(.{" + (parseInt(document.getElementById("width").value,10) * (1+emojiMode)) + "})";
 		var re = new RegExp(replace,"g");
-		document.getElementById('scribble').innerHTML = document.getElementById("container").textContent.replace(re, "$1<br>")
+		document.getElementById('scribble').innerHTML = document.getElementById("container").textContent.replace(re, "$1<br>");
+		//document.getElementById('scribble').innerHTML = document.getElementById('scribble').innerHTML.replace(re, "$1<br>");
+		//document.getElementById('scribble').innerHTML = document.getElementById('scribble').innerHTML.replace('\n', '');
 		//document.getElementById('scribble').innerHTML = document.getElementById("container").textContent;
     }
 
@@ -184,7 +193,7 @@
     }
 
 //    document.getElementById("palette").addEventListener("submit", ignore);
-	for (var item of ["hash","at","dot","dollar","dash","equals","eraser","asterisk"]) {
+	for (var item of ["hash","at","dot","dollar","dash","equals","eraser","asterisk","robot","poop","eye","skull"]) {
 		document.getElementById(item).addEventListener("click", targetCharClick);
 	}
 //	document.getElementById("custom").addEventListener("click", targetCharClick);
@@ -210,6 +219,8 @@
     	charSpaces[i].addEventListener("touchstart", addCharDammit);
     	charSpaces[i].addEventListener("touchmove", addCharDammit);
     }
+
+    redrawBoard();
 
 </script>
 
