@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>ascii draw</title>
+<meta charset="UTF-8">
+<title>ascii (and emoji) drawing board</title>
 
 <style type="text/css">
 	#scribble {
@@ -11,20 +12,26 @@
 		margin-top: 1em;
 		overflow: hidden;
 		padding:0em;
-		width: 200px;
-		height: 200px;
+		/* white-space: pre; */
+		width: 20em;
+		height: 260px;
 	}
 	#container {
+		float:left;
 		font-family: monospace;
-		width: 200px;
+		margin-top:1em;
+		width: 24em;
 		height: 200px;
 	}
 	.char {
 		float: left;
 		border:1px solid #ccc;
 		text-align: center;
-		width:8px;
+		width:1em;
 		height:16px;
+	}
+	div.clear {
+		clear: both;
 	}
 	.not-selectable {
 	  -webkit-touch-callout: none;
@@ -34,44 +41,95 @@
 	  -ms-user-select: none;
 	  user-select: none;
 	}
+	.palette {
+		float:left;
+		margin:1em;
+		width:6.25em;
+	}
 	.palette a {
 		background-color: #eee;
 		border:1px solid gray;
+		display: block;
+		float:left;
+		font-size: large;
+		height:1.5em;
 		padding: .25em;
+		text-align: center;
+		text-decoration: none;
+		width:1.5em;
 	}
 </style>
 </head>
 <body>
 
-<h1>ASCII Drawing Board</h1>
-<p>Draw on the grid below. View and copy-and-paste your results below the grid.</p>
+<h1>ASCII* Drawing Board</h1>
+<p><em>* and <a href="https://getemoji.com/">emoji</a>!</em></p>
+<p>Draw on the grid below. View and copy-and-paste your results in the adjacent box.</p>
+<p>Note that regular characters and emoji are different widths. Mixing and matching will result is loss of alignment.</p>
+
+<form method="POST" action="#" onsubmit="redrawBoard(); return false;">
+	<label>Width: <input type="text" name="width" id="width" size="2" maxlength="2" value="14"></label>
+	<label>Height: <input type="text" name="height" id="height" size="2" maxlength="2" value="8"></label>
+	<label>Emoji Mode: <input type="checkbox" name="emojiMode" id="emojiMode" value="1"></label>
+	<input type="submit" value="Update Board"> (clears current board)
+</form>
 
 <!--<div id="board" style="width:200px; height:200px; border:1px solid black; font-family: monospace;"></div> -->
 
-<div id="container" class="not-selectable">
-<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
-<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
-<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
-<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
-<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
-<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
-<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
-<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
-<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
-<div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div><div class="char"></div>
+<div class="palette">
+	<a href="#" id="hash" title="#">#</a>
+	<a href="#" id="at" title="@">@</a>
+	<a href="#" id="dot" title=".">.</a>
+	<a href="#" id="dollar" title="dollar">$</a>
+	<a href="#" id="dash" title="dash">-</a>
+	<a href="#" id="equals" title="equals">=</a>
+	<a href="#" id="asterisk" title="asterisk">*</a>
+	<a href="#" id="eraser" title="eraser">&nbsp;</a>
+	<div>custom: <input type="text" id="custom" size="1" maxlength="2"></div>
 </div>
 
-<div class="palette">
-	hash: <a href="#" id="hash">#</a>
-	at-sign: <a href="#" id="at">@</a>
-	dot: <a href="#" id="dot">.</a>
-	eraser: <a href="#" id="eraser">&nbsp;</a>
-	custom: <a href="#" onclick="changeTargetChar(window.prompt('What character?')); return false;">click</a>
-</div>
+<div id="container" class="not-selectable"></div>
 
 <div id="scribble"></div>
 
 <script>
+	var emojiMode = 0;
+	var toggleEmojiMode = function () {
+		if (document.getElementById("emojiMode").checked) {
+			emojiMode = 1;
+		} else {
+			emojiMode = 0;
+		}
+	}
+	document.getElementById("emojiMode").addEventListener("change", toggleEmojiMode);
+
+	var redrawBoard = function () {
+		"use strict";
+		var w, h, i, j, clearNodeTemplate, clearNode, charNodeTemplate, charNode;
+		w = document.getElementById("width").value;
+		h = document.getElementById("height").value;
+		document.getElementById("container").innerHTML = "";
+		charNode = '<div class="char"></div>';
+		clearNodeTemplate = document.createElement("div");
+		clearNodeTemplate.className = "clear";
+		charNodeTemplate = document.createElement("div");
+		charNodeTemplate.className = "char";
+		for (i = 0; i < h; i++) {
+			for (j = 0; j < w; j++) {
+				charNode = charNodeTemplate.cloneNode();
+				charNode.innerHTML = "&nbsp;";
+		    	charNode.addEventListener("mouseenter", addChar);
+		    	charNode.addEventListener("mousedown", addCharDammit);
+		    	charNode.addEventListener("touchstart", addCharDammit);
+		    	charNode.addEventListener("touchmove", addCharDammit);
+				document.getElementById("container").append(charNode);
+			}
+			clearNode = clearNodeTemplate.cloneNode();
+			clearNode.textContent = "\n";
+			document.getElementById("container").append(clearNode);
+		}
+	}
+
 	var isActive = false;
 
 	var ignore = function () {
@@ -82,7 +140,13 @@
 		targetChar = ch;
 	}
 	var targetCharClick = function (e) {
-		changeTargetChar(e.target.innerHTML);
+		var targetChar = "#";
+		if (e.target.innerHTML) {
+			targetChar = e.target.innerHTML;
+		} else {
+			targetChar = e.target.value;
+		}
+		changeTargetChar(targetChar);
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -101,7 +165,10 @@
     }
 
     var dumpText = function() {
-		document.getElementById('scribble').innerHTML = document.getElementById("container").textContent;
+    	var replace = "(.{" + (parseInt(document.getElementById("width").value,10) * (1+emojiMode)) + "})";
+		var re = new RegExp(replace,"g");
+		document.getElementById('scribble').innerHTML = document.getElementById("container").textContent.replace(re, "$1<br>")
+		//document.getElementById('scribble').innerHTML = document.getElementById("container").textContent;
     }
 
     var addChar = function (e) {
@@ -117,10 +184,16 @@
     }
 
 //    document.getElementById("palette").addEventListener("submit", ignore);
-    document.getElementById("hash").addEventListener("click", targetCharClick);
-    document.getElementById("at").addEventListener("click", targetCharClick);
-    document.getElementById("dot").addEventListener("click", targetCharClick);
-	document.getElementById("eraser").addEventListener("click", targetCharClick);
+	for (var item of ["hash","at","dot","dollar","dash","equals","eraser","asterisk"]) {
+		document.getElementById(item).addEventListener("click", targetCharClick);
+	}
+//	document.getElementById("custom").addEventListener("click", targetCharClick);
+
+	// clear current custom value
+	document.getElementById("custom").addEventListener("focus", function (e) { e.target.value = ""; });
+	// Update target char whenever there is a change to custom
+	document.getElementById("custom").addEventListener("input", targetCharClick);
+
 
 //    document.getElementById("board").addEventListener("mouseout", activeOff);
 //    document.getElementById("board").addEventListener("mouseup", activeOff);
@@ -134,6 +207,8 @@
     	charSpaces[i].innerHTML = "&nbsp;";
     	charSpaces[i].addEventListener("mouseenter", addChar);
     	charSpaces[i].addEventListener("mousedown", addCharDammit);
+    	charSpaces[i].addEventListener("touchstart", addCharDammit);
+    	charSpaces[i].addEventListener("touchmove", addCharDammit);
     }
 
 </script>
