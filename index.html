@@ -108,6 +108,7 @@
 
 <hr>
 <p><a href="#" onclick="resetPalette(); return false;">Reset Palette</a></p>
+<ol id="history"></ol>
 <p>Questions? Comments? Contact chris @ osric . com.</p>
 
 
@@ -181,6 +182,7 @@
     var activeOff = function (e) {
         "use strict";
         isActive = false;
+        writeHistory();
     }
 
     var toggleActive = function (e) {
@@ -219,6 +221,45 @@
     // Update target char whenever there is a change to custom
     document.getElementById("custom").addEventListener("input", targetCharClick);
 
+
+
+    // keep track of changes so the user can undo/redo
+    var writeHistory = function() {
+        "use strict";
+        var pointInHistory = document.createElement("li");
+        var pointInHistoryRevert = document.createElement("a");
+        pointInHistoryRevert.href = "#";
+        pointInHistoryRevert.addEventListener("click", revertHistory);
+        pointInHistoryRevert.innerHTML = document.getElementById("container").textContent;
+        pointInHistory.append(pointInHistoryRevert);
+        document.getElementById("history").append(pointInHistory);
+    }
+
+
+    // revert history
+    var revertHistory = function (e) {
+        "use strict";
+        var i = 0;
+        var chars = e.target.textContent;
+        console.log(chars);
+        // loop over board and fill in chars
+        var board = document.getElementById("container");
+        for (var boardSpace of board.getElementsByTagName("div")) {
+            var myChar = String.fromCodePoint(chars.codePointAt(i));
+            boardSpace.innerHTML = String.fromCodePoint(chars.codePointAt(i));
+            // XXX: does > 100000 mean emoji?
+            if (chars.codePointAt(i) > 100000) {
+                i = i + 2;
+            } else {
+                i = i + 1;
+            }
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        dumpText();
+    }
+
+
     // this adds custom items to the palette but can also cause problems
     var addToPalette = function(e) {
     	var newTool = document.createElement("a");
@@ -254,7 +295,6 @@
     // Add custom palette items from local storage
     if (window.localStorage.getItem("palette")) {
 	    for (item of JSON.parse(window.localStorage.getItem("palette"))) {
-	    	console.log(item);
 	    	var newTool = document.createElement("a");
 	    	newTool.className = "local";
 	    	newTool.textContent = item;
