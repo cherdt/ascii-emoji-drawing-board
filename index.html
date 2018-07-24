@@ -108,6 +108,7 @@
 
 <hr>
 <p><a href="#" onclick="resetPalette(); return false;">Reset Palette</a></p>
+
 <ol id="history"></ol>
 <p>Questions? Comments? Contact chris @ osric . com.</p>
 
@@ -158,6 +159,8 @@
                 document.getElementById("container").append(charNode);
             }
         }
+
+        writeHistory();
     }
 
     var changeTargetChar = function (ch) {
@@ -226,26 +229,25 @@
     // keep track of changes so the user can undo/redo
     var writeHistory = function() {
         "use strict";
+        var history = document.getElementById("history");
         var pointInHistory = document.createElement("li");
         var pointInHistoryRevert = document.createElement("a");
         pointInHistoryRevert.href = "#";
         pointInHistoryRevert.addEventListener("click", revertHistory);
         pointInHistoryRevert.innerHTML = document.getElementById("container").textContent;
         pointInHistory.append(pointInHistoryRevert);
-        document.getElementById("history").append(pointInHistory);
+        history.insertBefore(pointInHistory, history.firstChild);
     }
 
-
-    // revert history
-    var revertHistory = function (e) {
-        "use strict";
+    // restore state
+    var restoreState = function (chars) {
+    	"use strict";
+    	var board = document.getElementById("container");
+    	var boardSpace, myChar;
         var i = 0;
-        var chars = e.target.textContent;
-        console.log(chars);
-        // loop over board and fill in chars
-        var board = document.getElementById("container");
-        for (var boardSpace of board.getElementsByTagName("div")) {
-            var myChar = String.fromCodePoint(chars.codePointAt(i));
+    	// loop over board and fill in chars
+        for (boardSpace of board.getElementsByTagName("div")) {
+            myChar = String.fromCodePoint(chars.codePointAt(i));
             boardSpace.innerHTML = String.fromCodePoint(chars.codePointAt(i));
             // XXX: does > 100000 mean emoji?
             if (chars.codePointAt(i) > 100000) {
@@ -254,11 +256,33 @@
                 i = i + 1;
             }
         }
+    }
+
+    // revert history
+    var revertHistory = function (e) {
+        "use strict";
+        var chars = e.target.textContent;
+        restoreState(chars);
         e.preventDefault();
         e.stopPropagation();
         dumpText();
     }
 
+    var undo = function () {
+    	"use strict";
+    	var commandHistory = document.getElementById("history");
+    	var chars;
+    	commandHistory.getElementsByTagName("li")[0].remove();
+    	if (commandHistory.getElementsByTagName("li").length > 0) {
+	    	chars = commandHistory.getElementsByTagName("li")[0].textContent;
+	        restoreState(chars);
+    	}
+    }
+
+    var redo = function () {
+    	"use strict";
+    	console.log("redo doesn't do anything yet");
+    }
 
     // this adds custom items to the palette but can also cause problems
     var addToPalette = function(e) {
@@ -302,6 +326,11 @@
 	    }    	
     }
 
+</script>
+<script type="text/javascript" src="shortcut.js"></script>
+<script type="text/javascript">
+	shortcut.add("Alt+U", undo);
+	shortcut.add("Alt+Y", redo);
 </script>
 
 </body>
