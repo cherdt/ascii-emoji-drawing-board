@@ -5,9 +5,9 @@
 <title>ASCII (and emoji) drawing board</title>
 
 <style type="text/css">
-	hr {
-		clear: both;
-	}
+    hr {
+        clear: both;
+    }
     #container {
         float:left;
         font-family: monospace;
@@ -68,6 +68,10 @@
         width: 20em;
         height: 260px;
     }
+
+    #history li.current {
+        background-color: #ffd;
+    }
 </style>
 </head>
 <body>
@@ -107,8 +111,9 @@
 <div id="scribble"></div>
 
 <hr>
-<p><a href="#" onclick="resetPalette(); return false;">Reset Palette</a></p>
+<p>The palette saves any custom characters or emoji you add, but you can always <a href="#" onclick="resetPalette(); return false;">reset the palette</a></p>
 
+<p>History:</p>
 <ol id="history"></ol>
 <p>Questions? Comments? Contact chris @ osric . com.</p>
 
@@ -118,6 +123,7 @@
     var emojiMode = 0; // default to ASCII text
     var isActive = false; // default to pen-up
     var targetChar = "#"; // the default character is an octothorpe
+    var historyPointer = 0; // which element of state history is current
 
     // Turn emoji-mode on and off
     var toggleEmojiMode = function () {
@@ -131,6 +137,31 @@
 
     // Change emoji-mode when the emoji-mode checkbox is changed
     document.getElementById("emojiMode").addEventListener("change", toggleEmojiMode);
+
+
+    parseQS = function () {
+    	"use strict";
+    	var i, kv, key, val, json, qsArray;
+        // Remove leading question mark ("?") and split into array of key/value pairs
+        qsArray = location.search.slice(1).split("&");
+        // Initialize object to store key/value pairs
+        json = {};
+        // Loop through key/value pairs and separate into keys and values
+        for (i = 0; i < qsArray.length; i++) {
+            kv = qsArray[i].split("=");
+            key = kv[0];
+            val;
+            if (kv.length === 1) {
+            	val = key;
+            } else {
+	            // A key may be present without a value, so set a placeholder value
+	            val = kv[1];            	
+            }
+            json[key] = val;
+        }
+        return json;
+    }
+
 
     // Re-create the drawing board, triggered on page load and optionally by the user
     var redrawBoard = function () {
@@ -214,15 +245,17 @@
         dumpText();
     }
 
-    // Attach event handlers for palette selections
-    for (var item of ["hash","at","dot","dollar","dash","equals","eraser","asterisk","robot","poop","eye","skull"]) {
-        document.getElementById(item).addEventListener("click", targetCharClick);
-    }
 
-    // clear current custom value
-    document.getElementById("custom").addEventListener("focus", function (e) { e.target.value = ""; });
-    // Update target char whenever there is a change to custom
-    document.getElementById("custom").addEventListener("input", targetCharClick);
+    // remove highlight from all history items
+    var unhighlightHistory = function () {
+        "use strict";
+        var history = document.getElementById("history");
+        var anchors = history.getElementsByTagName("li");
+        var anchor;
+        for (anchor of anchors) {
+            anchor.classList.remove("current");
+        }
+    };
 
 
 
@@ -232,7 +265,9 @@
         var history = document.getElementById("history");
         var pointInHistory = document.createElement("li");
         var pointInHistoryRevert = document.createElement("a");
-        pointInHistoryRevert.href = "#";
+        unhighlightHistory();
+        pointInHistoryRevert.href = "?str=" + encodeURIComponent(document.getElementById("container").textContent);
+        pointInHistory.className = "current";
         pointInHistoryRevert.addEventListener("click", revertHistory);
         pointInHistoryRevert.innerHTML = document.getElementById("container").textContent;
         pointInHistory.append(pointInHistoryRevert);
@@ -241,62 +276,70 @@
 
     // restore state
     var restoreState = function (chars) {
-    	"use strict";
-    	var board = document.getElementById("container");
-    	var boardSpace, myChar;
+        "use strict";
+        var board = document.getElementById("container");
+        var boardSpace, myChar;
         var i = 0;
-    	// loop over board and fill in chars
+        // loop over board and fill in chars
         for (boardSpace of board.getElementsByTagName("div")) {
-            myChar = String.fromCodePoint(chars.codePointAt(i));
-            boardSpace.innerHTML = String.fromCodePoint(chars.codePointAt(i));
-            // XXX: does > 100000 mean emoji?
-            if (chars.codePointAt(i) > 100000) {
-                i = i + 2;
-            } else {
-                i = i + 1;
-            }
+        	if (chars.codePointAt(i) !== undefined) {
+	            myChar = String.fromCodePoint(chars.codePointAt(i));
+	            boardSpace.innerHTML = String.fromCodePoint(chars.codePointAt(i));
+	            // XXX: does > 100000 mean emoji?
+	            if (chars.codePointAt(i) > 100000) {
+	                i = i + 2;
+	            } else {
+	                i = i + 1;
+	            }        		
+        	} else {
+        		i = i + 1;
+        	}
         }
+        // Draw on scribble/copy-paste board
+        dumpText();
     }
 
     // revert history
     var revertHistory = function (e) {
         "use strict";
         var chars = e.target.textContent;
+        unhighlightHistory();
         restoreState(chars);
+        e.target.parentNode.className = "current";
         e.preventDefault();
         e.stopPropagation();
         dumpText();
     }
 
     var undo = function () {
-    	"use strict";
-    	var commandHistory = document.getElementById("history");
-    	var chars;
-    	commandHistory.getElementsByTagName("li")[0].remove();
-    	if (commandHistory.getElementsByTagName("li").length > 0) {
-	    	chars = commandHistory.getElementsByTagName("li")[0].textContent;
-	        restoreState(chars);
-    	}
+        "use strict";
+        var commandHistory = document.getElementById("history");
+        var chars;
+        commandHistory.getElementsByTagName("li")[0].remove();
+        if (commandHistory.getElementsByTagName("li").length > 0) {
+            chars = commandHistory.getElementsByTagName("li")[0].textContent;
+            restoreState(chars);
+        }
     }
 
     var redo = function () {
-    	"use strict";
-    	console.log("redo doesn't do anything yet");
+        "use strict";
+        console.log("redo doesn't do anything yet");
     }
 
     // this adds custom items to the palette but can also cause problems
     var addToPalette = function(e) {
-    	var newTool = document.createElement("a");
-    	var paletteItems = [];
-    	newTool.textContent = e.target.value;
-    	newTool.className = "local";
-    	document.getElementById("palette").insertBefore(newTool,document.getElementById("palette").getElementsByTagName("div")[0]);
-    	newTool.addEventListener("click", targetCharClick);
-    	if (window.localStorage.getItem("palette")) {
-    		paletteItems = JSON.parse(window.localStorage.getItem("palette"));
-    	}
-    	paletteItems.push(e.target.value);
-    	window.localStorage.setItem("palette", JSON.stringify(paletteItems));
+        var newTool = document.createElement("a");
+        var paletteItems = [];
+        newTool.textContent = e.target.value;
+        newTool.className = "local";
+        document.getElementById("palette").insertBefore(newTool,document.getElementById("palette").getElementsByTagName("div")[0]);
+        newTool.addEventListener("click", targetCharClick);
+        if (window.localStorage.getItem("palette")) {
+            paletteItems = JSON.parse(window.localStorage.getItem("palette"));
+        }
+        paletteItems.push(e.target.value);
+        window.localStorage.setItem("palette", JSON.stringify(paletteItems));
     }
     document.getElementById("custom").addEventListener("input", addToPalette);
 
@@ -304,33 +347,54 @@
     document.getElementById("container").addEventListener("mousedown", toggleActive);
     document.getElementById("container").addEventListener("mouseup", activeOff);
 
-    // This draws the initial board using the default width and height
-    redrawBoard();
+
 
     var resetPalette = function () {
-    	var i, nodes;
-    	window.localStorage.removeItem("palette");
-    	nodes = document.getElementById("palette").getElementsByClassName("local");
-    	for (i = nodes.length - 1; i >= 0; i--) {
-    		nodes.item(i).remove();
-    	}
+        var i, nodes;
+        window.localStorage.removeItem("palette");
+        nodes = document.getElementById("palette").getElementsByClassName("local");
+        for (i = nodes.length - 1; i >= 0; i--) {
+            nodes.item(i).remove();
+        }
     }
 
     // Add custom palette items from local storage
     if (window.localStorage.getItem("palette")) {
-	    for (item of JSON.parse(window.localStorage.getItem("palette"))) {
-	    	var newTool = document.createElement("a");
-	    	newTool.className = "local";
-	    	newTool.textContent = item;
-	    	document.getElementById("palette").insertBefore(newTool,document.getElementById("palette").getElementsByTagName("div")[0]);
-	    }    	
+        for (item of JSON.parse(window.localStorage.getItem("palette"))) {
+            var newTool = document.createElement("a");
+            newTool.className = "local";
+            newTool.href = "#";
+            newTool.textContent = item;
+            document.getElementById("palette").insertBefore(newTool,document.getElementById("palette").getElementsByTagName("div")[0]);
+        }        
+    }
+
+    // Attach event handlers for palette selections
+    for (var item of document.getElementById("palette").getElementsByTagName("a")) {
+        item.addEventListener("click", targetCharClick);
+    }
+
+    // clear current custom value
+    document.getElementById("custom").addEventListener("focus", function (e) { e.target.value = ""; });
+    // Update target char whenever there is a change to custom
+    document.getElementById("custom").addEventListener("input", targetCharClick);
+
+
+
+    // This draws the initial board using the default width and height
+    redrawBoard();
+
+    // Is a location parameter "str" specified?
+    var json = parseQS();
+    if (json.str !== undefined) {
+    	restoreState(decodeURIComponent(json.str));
     }
 
 </script>
 <script type="text/javascript" src="shortcut.js"></script>
 <script type="text/javascript">
-	shortcut.add("Alt+U", undo);
-	shortcut.add("Alt+Y", redo);
+    shortcut.add("Alt+U", undo);
+    shortcut.add("Alt+Y", redo);
 </script>
 
 </body>
