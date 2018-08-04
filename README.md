@@ -13,4 +13,4 @@ I wanted to make a level-editor for https://osric.com/games/snake/.
 Prerequisites
 -------------
 
-`shortcut.js` from (Handling Keyboard Shortcuts in Javascript)[http://www.openjs.com/scripts/events/keyboard_shortcuts/]
+`shortcut.js` from [Handling Keyboard Shortcuts in Javascript](http://www.openjs.com/scripts/events/keyboard_shortcuts/)
