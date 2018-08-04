@@ -3,7 +3,7 @@ ASCII Drawing Board
 
 A tool to let the user draw Emoji (or ASCII characters).
 
-This is in a very rough state right now.
+This is in a very rough state right now. It currently lives at https://osric.com/chris/javascript/ascii-drawing-board/
 
 Why?
 ----
